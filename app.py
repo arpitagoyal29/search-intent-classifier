@@ -1,6 +1,12 @@
 import streamlit as st
 
-from src.classifier import load_artifacts, classify_query, get_redis_connection
+from src.classifier import (
+    load_artifacts,
+    classify_query,
+    get_redis_connection,
+    get_db_connection,
+    init_db,
+)
 
 
 @st.cache_resource
@@ -13,8 +19,16 @@ def get_cached_redis_connection():
     return get_redis_connection()
 
 
+@st.cache_resource
+def get_cached_db_connection():
+    conn = get_db_connection()
+    init_db(conn)
+    return conn
+
+
 model, vectorizer, known_sites = get_artifacts()
 redis_conn = get_cached_redis_connection()
+db_conn = get_cached_db_connection()
 
 st.title("Search Query Intent Classifier")
 st.write(
@@ -26,7 +40,7 @@ query = st.text_input("Enter a search query")
 
 if st.button("Classify"):
     if query.strip():
-        result = classify_query(query, model, vectorizer, known_sites, redis_conn=redis_conn)
+        result = classify_query(query, model, vectorizer, known_sites, redis_conn=redis_conn, db_conn=db_conn)
 
         st.header(result["predicted"])
         st.write(f"Confidence: {result['confidence'] * 100:.1f}%")
