@@ -1,5 +1,5 @@
-pandas
+pandas==3.0.5
 scikit-learn==1.6.1
-rapidfuzz
-joblib
-streamlit
+rapidfuzz==3.14.5
+joblib==1.5.3
+streamlit==1.60.0
